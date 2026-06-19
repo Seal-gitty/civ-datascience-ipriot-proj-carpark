@@ -7,9 +7,11 @@ from interfaces import CarparkSensorListener
 from interfaces import CarparkDataProvider
 import threading
 import time
+import logging
 import tkinter as tk
+from config_parser import parse_config
 from typing import Iterable
-#TODO: replace this module with yours
+from carpark_manager import CarparkManager
 import mocks
 
 # ------------------------------------------------------------------------------------#
@@ -80,11 +82,16 @@ class CarParkDisplay:
     def __init__(self,root):
         self.window = WindowedDisplay(root,
             'Moondalup', CarParkDisplay.fields)
+        self._update_signal = threading.Event()   # NEW
         updater = threading.Thread(target=self.check_updates)
         updater.daemon = True
         updater.start()
         self.window.show()
         self._provider=None
+        self.btn_show_parked = tk.Button(
+            self.window.window, text='Show Currently Parked',
+            font=('Arial', 20), command=self.show_parked_cars)
+        self.btn_show_parked.grid(row=10, column=0, columnspan=3, pady=20)
     
     @property
     def data_provider(self):
@@ -93,21 +100,45 @@ class CarParkDisplay:
     def data_provider(self,provider):
         if isinstance(provider,CarparkDataProvider):
             self._provider=provider
+    
+    def notify_update(self):
+        """Call this whenever the underlying data changes, to refresh
+        the display immediately instead of waiting for the next poll."""
+        self._update_signal.set()
+    
+    def show_parked_cars(self):
+        """Open a small popup window listing every car currently parked."""
+        if self._provider is None:
+            return
+
+        popup = tk.Toplevel(self.window.window)
+        popup.title('Currently Parked')
+        popup.geometry('400x400')
+
+        parked = self._provider.parked_cars
+        if not parked:
+            tk.Label(popup, text='No cars currently parked.',
+                     font=('Arial', 14)).pack(pady=10)
+        else:
+            for plate, car in parked.items():
+                entry_str = time.strftime('%H:%M:%S', car.entry_time)
+                tk.Label(popup, text=f'{plate} — entered {entry_str}',
+                         font=('Arial', 14)).pack(anchor='w', padx=10)
 
     def update_display(self):
+        temp = self._provider.temperature
+        temp_display = f'{temp:.0f}℃' if temp is not None else '– – –'
         field_values = dict(zip(CarParkDisplay.fields, [
             f'{self._provider.available_spaces:03d}',
-            f'{self._provider.temperature:02d}℃',
+            temp_display,
             time.strftime("%H:%M:%S",self._provider.current_time)
         ]))
         self.window.update(field_values)
 
     def check_updates(self):
         while True:
-            # TODO: This timer is pretty janky! Can you provide some kind of signal from your code
-            # to update the display?
-            time.sleep(1)
-            # When you get an update, refresh the display.
+            self._update_signal.wait()   # blocks here until notify_update() is called
+            self._update_signal.clear()  # reset so we can wait again next time
             if self._provider is not None:
                 self.update_display()
 
@@ -131,7 +162,7 @@ class CarDetectorWindow:
         )
         self.temp_label.grid(padx=10, pady=5,column=0,row=2)
         self.temp_var=tk.StringVar()
-        self.temp_var.trace_add("write",lambda x,y,v: self.temperature_changed(float(self.temp_var.get())))
+        self.temp_var.trace_add("write",lambda x,y,v: self._on_temp_var_write())
         self.temp_box=tk.Entry(
             self.root,font=('Arial', 20),textvariable=self.temp_var
         )
@@ -164,6 +195,17 @@ class CarDetectorWindow:
 #        print("Car goes out")
         for listener in self.listeners:
             listener.outgoing_car(self.current_license)
+    
+    def _on_temp_var_write(self):
+        """Called on every keystroke in the temperature box. While
+        typing, the text is often briefly invalid (empty, just '-',
+        just '.') so we only fire temperature_changed once it parses
+        as a real number."""
+        try:
+            value = float(self.temp_var.get())
+        except ValueError:
+            return
+        self.temperature_changed(value)
 
     def temperature_changed(self,temp):
         for listener in self.listeners:
@@ -173,15 +215,20 @@ class CarDetectorWindow:
 if __name__ == '__main__':
     root = tk.Tk()
 
-    #TODO: This is my dodgy mockup. Replace it with a good one!
-    mock=mocks.MockCarparkManager()
-
     display=CarParkDisplay(root)
-    #TODO: Set the display to use your data source
-    display.data_provider=mock
+
+    manager=CarparkManager('samples_and_snippets/config.json', on_change=display.notify_update)
+    display.data_provider=manager
 
     detector=CarDetectorWindow(root)
-    #TODO: Attach your event listener
-    detector.add_listener(mock)
+    detector.add_listener(manager)
+
+    print("Currently parked:")
+    for plate, car in manager.parked_cars.items():
+        print(f"  {plate} (entered {time.strftime('%H:%M:%S', car.entry_time)})")
+
+    print("\nFull activity log:")
+    for line in manager.get_activity_log():
+        print(line.strip())
 
     root.mainloop()
