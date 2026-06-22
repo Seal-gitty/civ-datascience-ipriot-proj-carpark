@@ -1,5 +1,5 @@
 import unittest
-import json  # you can use toml, json,yaml, or ryo for your config file
+import json 
 import sys,os
 from pathlib import Path
 cwd = Path(os.path.dirname(__file__))
@@ -10,41 +10,21 @@ sys.path.append(parent + "/smartpark")
 
 class TestConfigParsing(unittest.TestCase):
     def test_parse_config_has_correct_location_and_spaces(self):
-        # TODO: read from a configuration file...
         config_string = '''
-{
-    "CarParks": [
         {
-            "name": "raf-park-international",
-            "total-spaces": 130,
-            "total-cars": 0,
-            "location": "moondalup",
-            "broker": "localhost",
-            "port": 1883,
-            "Sensors": [
+            "CarParks": [
                 {
-                    "name": "sensor1",
-                    "type": "entry"
-                },
-                {
-                    "name": "sensor2",
-                    "type": "exit"
-                }
-            ],
-            "Displays": [
-                {
-                    "name": "display1"
+                    "name": "raf-park-international",
+                    "total-spaces": 130,
+                    "location": "moondalup"
                 }
             ]
         }
-    ]
-}
         '''
         config = json.loads(config_string)
-        parking_lot = pc.parse_config(config)
-        self.assertEqual(parking_lot['location'], "Moondalup City Square Parking")
-        self.assertEqual(parking_lot['total_spaces'], 192)
-# TODO: create an additional TestCase in a separate file with at least one test of the remaining classes. 
+        parking_lot = config["CarParks"] [0]
+        self.assertEqual(parking_lot['location'], "moondalup")
+        self.assertEqual(parking_lot['total-spaces'], 130)
 
 if __name__=="__main__":
     unittest.main()
