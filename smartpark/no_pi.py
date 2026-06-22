@@ -12,7 +12,6 @@ import tkinter as tk
 from config_parser import parse_config
 from typing import Iterable
 from carpark_manager import CarparkManager
-import mocks
 
 # ------------------------------------------------------------------------------------#
 # You don't need to understand how to implement this class.                           #
