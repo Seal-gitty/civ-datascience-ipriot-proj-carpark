@@ -67,7 +67,9 @@ class CarparkManager(CarparkSensorListener, CarparkDataProvider):
         self.name = config.get("name", "Unnamed Carpark")
         self.location = config.get("location", "Unknown Location")
         self.total_spaces = config["total-spaces"]
-
+        """
+        log created
+        """
         # Dict keyed by license plate -> Car. Only contains cars
         # currently parked; departed cars are removed.
         self._parked_cars = {}
