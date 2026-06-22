@@ -1,0 +1,22 @@
+2026-06-22 16:51:24,144 INFO CarparkManager started for 'raf-park-international' (moondalup) with 130 spaces (config: samples_and_snippets/config.json)
+2026-06-22 16:51:28,249 INFO Temperature reading: 2.0
+2026-06-22 16:51:28,344 INFO Temperature reading: 23.0
+2026-06-22 16:51:32,481 INFO Car IN: 123 (129 spaces left)
+2026-06-22 16:51:36,008 INFO Car IN: 1234 (128 spaces left)
+2026-06-22 16:51:36,878 INFO Car OUT: 1234 (129 spaces left)
+2026-06-22 16:51:42,202 INFO Car IN: 12345 (128 spaces left)
+2026-06-22 17:32:52,418 INFO CarparkManager started for 'raf-park-international' (moondalup) with 130 spaces (config: samples_and_snippets/config.json)
+2026-06-22 17:33:04,052 INFO CarparkManager started for 'raf-park-international' (moondalup) with 130 spaces (config: samples_and_snippets/config.json)
+2026-06-22 17:33:09,372 INFO CarparkManager started for 'raf-park-international' (moondalup) with 130 spaces (config: samples_and_snippets/config.json)
+2026-06-22 18:00:24,461 INFO CarparkManager started for 'raf-park-international' (moondalup) with 130 spaces (config: samples_and_snippets/config.json)
+2026-06-22 18:08:50,346 INFO CarparkManager started for 'raf-park-international' (moondalup) with 130 spaces (config: samples_and_snippets/config.json)
+2026-06-22 21:44:46,297 INFO CarparkManager started for 'raf-park-international' (moondalup) with 130 spaces (config: samples_and_snippets/config.json)
+2026-06-22 21:44:52,127 INFO Temperature reading: 1.0
+2026-06-22 21:44:52,223 INFO Temperature reading: 15.0
+2026-06-22 21:44:55,142 INFO Temperature reading: 1.0
+2026-06-22 21:44:55,510 INFO Temperature reading: 16.0
+2026-06-22 21:45:00,053 INFO Car IN: 123 (129 spaces left)
+2026-06-22 21:45:02,106 INFO Car IN: 1234 (128 spaces left)
+2026-06-22 21:45:03,258 INFO Car IN: 12345 (127 spaces left)
+2026-06-22 21:45:09,090 INFO Car OUT: 12345 (128 spaces left)
+2026-06-22 21:45:11,708 WARNING Rejected outgoing_car for unrecognised plate '12345'
